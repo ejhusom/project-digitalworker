@@ -1,35 +1,8 @@
-# compiled files:
-build*
-*.o
-*.so
-*.a
-
 # data-files
 *.dat
-*.txt
 *.csv
-
-# doconce:
-.*_html_file_collection
-
-# eclipse files:
-*.cproject
-*.project
-
-# executables
-*.exe
-*.x
-
-# images
-#*.png
-#*.jpg
-#*.jpeg
-#*.pdf
-
-# jekyll
-#_site/
-.sass-cache
-.jekyll-metadata
+assets/data/raw
+!assets/data/raw/README.md
 
 # misc:
 .DS_Store
@@ -51,22 +24,25 @@ __pycache__
 *.swp
 *~
 .*~
+*.old
 tmp*
 .#*
 \#*
-
-# tex files:
-*.log
-*.dvi
-*.aux
-*.blg
-*.idx
-*.nav
-*.out
-*.toc
-*.snm
-*.vrb
-
-# vim
 Session.vim
 
+# python venv
+env/
+venv/
+venv*
+
+# large files
+model_tuning/
+models/
+
+# Files related to compilation of cython
+build/
+*.so
+cutils.c
+
+
+# project-specific files
