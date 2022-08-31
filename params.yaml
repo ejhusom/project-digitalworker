@@ -69,7 +69,7 @@ featurize:
     target_min_correlation_threshold: 0.0
 
 split:
-    train_split: 0.5
+    train_split: 0.6
     shuffle_files: False
     calibrate_split: 0.0
 
@@ -78,7 +78,7 @@ scale:
     output:
 
 sequentialize:
-    window_size: 10
+    window_size: 15
     overlap: 0
     target_size: 1
     shuffle_samples: False
@@ -90,8 +90,8 @@ train:
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 400
-    early_stopping: False
+    n_epochs: 200
+    early_stopping: True
     patience: 20
     activation_function: relu
     batch_size: 256
