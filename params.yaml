@@ -1,8 +1,9 @@
 profile:
-    dataset: digitalworker-combined
+    dataset: digitalworker
+        # dataset: test
 
 clean:
-    target: class
+    target: Class
     classification: True
     onehot_encode_target: True
     combine_files: False
@@ -90,8 +91,8 @@ train:
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 200
-    early_stopping: True
+    n_epochs: 100
+    early_stopping: False
     patience: 20
     activation_function: relu
     batch_size: 256

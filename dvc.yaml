@@ -7,8 +7,8 @@ stages:
         - src/profiling.py
         - src/profile.yaml
         - src/config.py
-        outs:
-        - assets/profile
+          # outs:
+                #- assets/profile
         params:
         - profile.dataset
 
@@ -16,7 +16,7 @@ stages:
         cmd: python3 src/clean.py assets/data/raw/
         deps:
         - assets/data/raw
-        - assets/profile
+          # - assets/profile
         - src/clean.py
         - src/config.py
         outs:

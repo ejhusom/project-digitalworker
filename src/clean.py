@@ -56,7 +56,8 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
 
     if inference_df is None:
         # Find removable variables from profiling report
-        removable_features = parse_profile_warnings()
+        # removable_features = parse_profile_warnings()
+        removable_features = []
         pd.DataFrame(removable_features).to_csv(REMOVABLE_FEATURES)
 
         # Find input files
@@ -73,6 +74,7 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
         ).reshape(-1)
 
         dfs = [inference_df]
+
 
     dfs = remove_features(dfs, removable_features)
     combined_df = pd.concat(dfs, ignore_index=True)

@@ -54,9 +54,11 @@ def profiling(dir_path):
     profile = ProfileReport(
         combined_df,
         title="Profiling Analysis",
-        config_file="src/profile.yaml",
+        #config_file="src/profile.yaml",
         lazy=False,
-        sort=None,
+        minimal=True,
+        #plot={'histogram': {'bins': None}},
+        #sort=None,
     )
 
     # Create folder for profiling report
@@ -69,4 +71,5 @@ def profiling(dir_path):
 
 if __name__ == "__main__":
 
-    profiling(sys.argv[1])
+    # profiling(sys.argv[1])
+    print("Profiling ignored")

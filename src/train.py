@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 import yaml
-from interpret.glassbox import ExplainableBoostingClassifier, ExplainableBoostingRegressor
+# from interpret.glassbox import ExplainableBoostingClassifier, ExplainableBoostingRegressor
 from joblib import dump
 from keras_tuner import HyperParameters
 from keras_tuner.tuners import BayesianOptimization, Hyperband, RandomSearch
@@ -268,11 +268,11 @@ def train(filepath):
                 },
                 verbose=2,
             )
-    elif learning_method.lower() == "explainableboosting":
-        if classification:
-            model = ExplainableBoostingClassifier(max_rounds=2)
-        else:
-            model = ExplainableBoostingRegressor()
+    # elif learning_method.lower() == "explainableboosting":
+    #     if classification:
+    #         model = ExplainableBoostingClassifier(max_rounds=2)
+    #     else:
+    #         model = ExplainableBoostingRegressor()
     elif learning_method == "linearregression":
         if classification:
             raise ValueError(
