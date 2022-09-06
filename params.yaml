@@ -1,6 +1,6 @@
 profile:
-    dataset: digitalworker
-        # dataset: test
+        # dataset: digitalworker
+    dataset: test
 
 clean:
     target: Class
@@ -31,21 +31,94 @@ featurize:
         # - Calf_AccZ
 
     # By setting this to True, the add_-options below are overrided.
-    use_all_engineered_features_on_all_variables: False
+    use_all_engineered_features_on_all_variables: True
 
     # List the variables below each add_* to add engineered feature
     add_sum:
-        # - variable1
+        # - Trunk_AccX 
+        # - Trunk_AccY 
+        # - Trunk_AccZ 
+        # - Arm_AccX 
+        # - Arm_AccY 
+        # - Arm_AccZ 
+        # - Hip_AccX 
+        # - Hip_AccY 
+        # - Hip_AccZ 
+        # - Thigh_AccX 
+        # - Thigh_AccY 
+        # - Thigh_AccZ 
+        # - Calf_AccX 
+        # - Calf_AccY 
+        # - Calf_AccZ
     add_gradient:
         # - variable1
+        # - Trunk_AccX 
+        # - Trunk_AccY 
+        # - Trunk_AccZ 
+        # - Arm_AccX 
+        # - Arm_AccY 
+        # - Arm_AccZ 
+        # - Hip_AccX 
+        # - Hip_AccY 
+        # - Hip_AccZ 
+        # - Thigh_AccX 
+        # - Thigh_AccY 
+        # - Thigh_AccZ 
+        # - Calf_AccX 
+        # - Calf_AccY 
+        # - Calf_AccZ
     add_mean:
-        # - variable1
+            #         - Trunk_AccX 
+            #         - Trunk_AccY 
+            #         - Trunk_AccZ 
+            #         - Arm_AccX 
+            #         - Arm_AccY 
+            #         - Arm_AccZ 
+            #         - Hip_AccX 
+            #         - Hip_AccY 
+            #         - Hip_AccZ 
+            #         - Thigh_AccX 
+            #         - Thigh_AccY 
+            #         - Thigh_AccZ 
+            #         - Calf_AccX 
+            #         - Calf_AccY 
+            #         - Calf_AccZ
     add_maximum:
-        # - variable1
+            #         - Trunk_AccX 
+            #         - Trunk_AccY 
+            #         - Trunk_AccZ 
+            #         - Arm_AccX 
+            #         - Arm_AccY 
+            #         - Arm_AccZ 
+            #         - Hip_AccX 
+            #         - Hip_AccY 
+            #         - Hip_AccZ 
+            #         - Thigh_AccX 
+            #         - Thigh_AccY 
+            #         - Thigh_AccZ 
+            #         - Calf_AccX 
+            #         - Calf_AccY 
+            #         - Calf_AccZ
+            #         - variable1
     add_minimum:
         # - variable1
     add_min_max_range:
-        # - variable1
+            #         - Trunk_AccX 
+            #         - Trunk_AccY 
+            #         - Trunk_AccZ 
+            #         - Arm_AccX 
+            #         - Arm_AccY 
+            #         - Arm_AccZ 
+            #         - Hip_AccX 
+            #         - Hip_AccY 
+            #         - Hip_AccZ 
+            #         - Thigh_AccX 
+            #         - Thigh_AccY 
+            #         - Thigh_AccZ 
+            #         - Calf_AccX 
+            #         - Calf_AccY 
+            #         - Calf_AccZ
+            #         - variable1
     add_slope:
         # - variable1
     add_slope_sin:
@@ -53,15 +126,30 @@ featurize:
     add_slope_cos:
         # - variable1
     add_standard_deviation:
-        # - variable1
+        #         - Trunk_AccX 
+        #         - Trunk_AccY 
+        #         - Trunk_AccZ 
+        #         - Arm_AccX 
+        #         - Arm_AccY 
+        #         - Arm_AccZ 
+        #         - Hip_AccX 
+        #         - Hip_AccY 
+        #         - Hip_AccZ 
+        #         - Thigh_AccX 
+        #         - Thigh_AccY 
+        #         - Thigh_AccZ 
+        #         - Calf_AccX 
+        #         - Calf_AccY 
+        #         - Calf_AccZ
+        #         - variable1
     add_variance:
         # - variable1
     add_peak_frequency:
         # - variable1
-    rolling_window_size_sum: 10
-    rolling_window_size_mean: 10
-    rolling_window_size_max_min: 10
-    rolling_window_size_standard_deviation: 10
+    rolling_window_size_sum: 60
+    rolling_window_size_mean: 60
+    rolling_window_size_max_min: 60
+    rolling_window_size_standard_deviation: 60
 
     # List features here to remove the raw variables after engineering features
     # from them
@@ -70,7 +158,7 @@ featurize:
     target_min_correlation_threshold: 0.0
 
 split:
-    train_split: 0.6
+    train_split: 0.7
     shuffle_files: False
     calibrate_split: 0.0
 
@@ -91,21 +179,22 @@ train:
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 100
+    n_epochs: 200
     early_stopping: False
     patience: 20
     activation_function: relu
     batch_size: 256
     n_layers: 4
-    n_neurons: [16,16,16,8]
+    n_neurons: [256,128,128,128]
+    # n_neurons: [16,16,16,8]
     dropout: 0.1
 
     # Parameters for cnn and rnn
-    n_flattened_layers: 1
-    n_flattened_nodes: 16
+    n_flattened_layers: 3
+    n_flattened_nodes: 32
 
     # Parameters for cnn:
-    kernel_size: 5
+    kernel_size: 3
     maxpooling: False
     maxpooling_size: 4
 
