@@ -1,6 +1,6 @@
 profile:
-        # dataset: digitalworker
-    dataset: test
+    dataset: digitalworker
+    # dataset: test
 
 clean:
     target: Class
@@ -185,12 +185,12 @@ train:
     activation_function: relu
     batch_size: 256
     n_layers: 4
-    n_neurons: [256,128,128,128]
+    n_neurons: [64,64,64,64]
     # n_neurons: [16,16,16,8]
     dropout: 0.1
 
     # Parameters for cnn and rnn
-    n_flattened_layers: 3
+    n_flattened_layers: 2
     n_flattened_nodes: 32
 
     # Parameters for cnn:

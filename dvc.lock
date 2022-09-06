@@ -18,7 +18,7 @@ stages:
       size: 1903
     params:
       params.yaml:
-        profile.dataset: test
+        profile.dataset: digitalworker
   clean:
     cmd: python3 src/clean.py assets/data/raw/
     deps:
@@ -238,21 +238,21 @@ stages:
         train.maxpooling: false
         train.maxpooling_size: 4
         train.n_epochs: 200
-        train.n_flattened_layers: 3
+        train.n_flattened_layers: 2
         train.n_flattened_nodes: 32
         train.n_layers: 4
         train.n_neurons:
-        - 256
-        - 128
-        - 128
-        - 128
+        - 64
+        - 64
+        - 64
+        - 64
         train.patience: 20
         train.seed: 2020
         train.unit_type: LSTM
     outs:
     - path: assets/models
-      md5: f50e90d910233de8552410bb606efeef.dir
-      size: 4873616
+      md5: 79183a0dd8f265840677bcfd62ce8eb2.dir
+      size: 1318052
       nfiles: 1
   evaluate:
     cmd: python3 src/evaluate.py assets/models/model.h5 assets/data/combined/train.npz
@@ -265,8 +265,8 @@ stages:
       md5: 30fe84e423255e7be2e701b502bcda35
       size: 115
     - path: assets/models/model.h5
-      md5: 86fec58438637e5447861325407d5dbd
-      size: 4873616
+      md5: 1967da5b707b18a55214cc69710c1e59
+      size: 1318052
     - path: src/config.py
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
@@ -279,11 +279,11 @@ stages:
         evaluate.show_inputs: true
     outs:
     - path: assets/metrics/metrics.json
-      md5: eb6607a23df7e7215b559411154c212e
+      md5: 38874289363c0c56d5ad3f321a987911
       size: 32
     - path: assets/predictions/predictions.csv
-      md5: 074921c94cf078ee089d0da12144b599
-      size: 19368
+      md5: 6318af565608dbd83a70da7ba6f3fb7a
+      size: 18780
     - path: assets/predictions/true_values.csv
       md5: 0e4dc56649978da4969f1db1491af535
       size: 451478
