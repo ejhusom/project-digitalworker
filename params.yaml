@@ -31,7 +31,7 @@ featurize:
         # - Calf_AccZ
 
     # By setting this to True, the add_-options below are overrided.
-    use_all_engineered_features_on_all_variables: True
+    use_all_engineered_features_on_all_variables: False
 
     # List the variables below each add_* to add engineered feature
     add_sum:
@@ -179,7 +179,7 @@ train:
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 200
+    n_epochs: 500
     early_stopping: False
     patience: 20
     activation_function: relu
