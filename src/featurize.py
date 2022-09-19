@@ -202,11 +202,11 @@ def compute_rolling_features(df, params, ignore_columns=None):
 
     if isinstance(params["featurize"]["add_maximum"], list):
         for var in params["featurize"]["add_maximum"]:
-            #df[f"{var}_maximum"] = (
-            #    df[var]
-            #    .rolling(params["featurize"]["rolling_window_size_max_min"])
-            #    .max()
-            #)
+            # df[f"{var}_maximum"] = (
+            #     df[var]
+            #     .rolling(params["featurize"]["rolling_window_size_max_min"])
+            #     .max()
+            # )
             df = pd.concat([
                     pd.Series(
                         df[var].rolling(params["featurize"]["rolling_window_size_max_min"]).max(),
@@ -279,7 +279,6 @@ def compute_rolling_features(df, params, ignore_columns=None):
                         name=f"{var}_slope_cos"),
                 df], axis=1
             )
-
 
     if isinstance(params["featurize"]["add_standard_deviation"], list):
         for var in params["featurize"]["add_standard_deviation"]:
