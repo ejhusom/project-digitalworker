@@ -23,7 +23,7 @@ def reduce_classes(filenames):
         df['Class'] = df['Class'].replace(to_replace=12, value=6)
 
         #print(os.path.basename(filename) + "_reduced_classes.csv")
-        df.to_csv(os.path.basename(filename) + "_reduced_classes.csv")
+        df.to_csv(os.path.basename(filename) + "_reduced_classes.csv", index=False)
         
 
         # if (9 in df.Class.unique()

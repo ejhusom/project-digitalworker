@@ -1,5 +1,5 @@
 profile:
-    dataset: digitalworker
+    dataset: digitalworker_reduced_classes
     # dataset: test
 
 clean:

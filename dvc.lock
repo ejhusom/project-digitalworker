@@ -18,7 +18,7 @@ stages:
       size: 1903
     params:
       params.yaml:
-        profile.dataset: digitalworker
+        profile.dataset: digitalworker_reduced_classes
   clean:
     cmd: python3 src/clean.py assets/data/raw/
     deps:
@@ -66,8 +66,8 @@ stages:
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
     - path: src/featurize.py
-      md5: a3cadd7a13999f77d5476614e5911b36
-      size: 15063
+      md5: 245ffb336335f0e79107fb7f5842dbb5
+      size: 15067
     params:
       params.yaml:
         clean.target: Class
