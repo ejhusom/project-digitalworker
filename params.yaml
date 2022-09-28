@@ -1,6 +1,6 @@
 profile:
-    dataset: digitalworker_reduced_classes
-    # dataset: test
+        # dataset: digitalworker_reduced_classes
+    dataset: test
 
 clean:
     target: Class

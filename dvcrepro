@@ -1,2 +1,2 @@
 #!/bin/bash
-dvc repro
+dvc repro --force
