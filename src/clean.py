@@ -67,6 +67,8 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
 
         for filepath in filepaths:
             dfs.append(pd.read_csv(filepath))
+            df = dfs[-1]
+            df["Class"] = df["Class"].astype(np.int64)
     else:
         # Remove features that should not be used with the current model.
         removable_features = np.array(

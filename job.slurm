@@ -5,7 +5,7 @@
 #SBATCH --ntasks 1
 #SBATCH --mem=128GB
 #SBATCH --cpus-per-task=8
-#SBATCH --time 00-08:00:00
+#SBATCH --time 00-12:00:00
 
 . "/opt/miniconda3/etc/profile.d/conda.sh"
 
