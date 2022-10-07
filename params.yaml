@@ -1,7 +1,7 @@
 profile:
-        #dataset: digitalworker_arm_angle_reduced_classes
+    dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    dataset: test
+    # dataset: test
 
 clean:
     target: Arm_Elevation
@@ -160,7 +160,7 @@ featurize:
     target_min_correlation_threshold: 0.0
 
 split:
-    train_split: 0.7
+    train_split: 0.5
     shuffle_files: False
     calibrate_split: 0.0
 
