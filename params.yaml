@@ -177,7 +177,7 @@ sequentialize:
 
 train:
     seed: 2020
-    learning_method: dnn
+    learning_method: xgboost
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):

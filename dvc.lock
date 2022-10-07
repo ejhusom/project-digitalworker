@@ -186,7 +186,7 @@ stages:
         sequentialize.shuffle_samples: false
         sequentialize.target_size: 1
         sequentialize.window_size: 1
-        train.learning_method: dnn
+        train.learning_method: xgboost
     outs:
     - path: assets/data/sequentialized
       md5: 7a912e301d67e51a59e4bef19d8e5b8d.dir
@@ -238,7 +238,7 @@ stages:
         train.early_stopping: true
         train.hyperparameter_tuning: false
         train.kernel_size: 3
-        train.learning_method: dnn
+        train.learning_method: xgboost
         train.maxpooling: false
         train.maxpooling_size: 4
         train.n_epochs: 200
@@ -255,8 +255,8 @@ stages:
         train.unit_type: LSTM
     outs:
     - path: assets/models
-      md5: 40382d3e2c1728e6c5adecd9493404c0.dir
-      size: 203192
+      md5: cf3ea3ed0e3560db8283d2eb07e55f57.dir
+      size: 611411
       nfiles: 1
   evaluate:
     cmd: python3 src/evaluate.py assets/models/model.h5 assets/data/combined/train.npz
@@ -269,8 +269,8 @@ stages:
       md5: 4e01c6fab0d360c09e1eb4f7ded46e00
       size: 19
     - path: assets/models/model.h5
-      md5: c9cbbf347a29e04994145d3b9cdbee9d
-      size: 203192
+      md5: 153019a1b2f59ecca21aa3d7343c08de
+      size: 611411
     - path: src/config.py
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
@@ -283,11 +283,11 @@ stages:
         evaluate.show_inputs: true
     outs:
     - path: assets/metrics/metrics.json
-      md5: 4b4a642958fab80fe7cc46c580717a5a
-      size: 108
+      md5: bc8a46faf2907884b60d504853a2e816
+      size: 110
     - path: assets/predictions/predictions.csv
-      md5: 1fa1f31719edfbea3cd4d396910f517e
-      size: 1344671
+      md5: 869d53207af94699df7fad9314663036
+      size: 1337798
     - path: assets/predictions/true_values.csv
       md5: 2d7cf80a1825cb131259f1f2bb8c78b3
       size: 1554195
