@@ -84,6 +84,9 @@ def featurize(dir_path="", inference=False, inference_df=None):
         # Read csv
         df = pd.read_csv(filepath, index_col=0)
 
+        for col in df.columns[1:]:
+            df[col] = df[col].astype(np.float64)
+
         df = _featurize(df, features, remove_features, params, output_columns)
 
         # Move target column(s) to the beginning of dataframe
@@ -121,9 +124,9 @@ def _featurize(df, features, remove_features, params, output_columns):
             del df[col]
 
         # Remove feature if it is non-numeric
-        elif not is_numeric_dtype(df[col]):
-            print(f"Removing feature {col} because it is non-numeric.")
-            del df[col]
+        # elif not is_numeric_dtype(df[col]):
+        #     print(f"Removing feature {col} because it is non-numeric.")
+        #     del df[col]
 
         # Convert boolean feature to integer
         elif df.dtypes[col] == bool:

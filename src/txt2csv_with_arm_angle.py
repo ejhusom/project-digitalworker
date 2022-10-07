@@ -50,14 +50,14 @@ def txt2csv(filenames):
             df = pd.read_csv(f, names=headers)
             # df["Timestamp"] = pd.to_datetime(df["Timestamp"]).astype(int) / 10**9
             # df["Timestamp"] = df["Timestamp"].astype(np.int64)
-            df = df.iloc[:,:21]
+            drop_cols = [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+            df.drop(df.columns[drop_cols], axis=1, inplace=True)
             df["Class"] = df["Class"].astype(np.int64)
-            df["Arm_Inclination"] = df["Arm_Inclination"].astype(np.float64)
-            del df["Trunk_Inclination"]
-            del df["Trunk_Forward"]
-            del df["Trunk_Sideways"]
-            print(df.info())
-            print(df.describe())
+            df["Arm_Elevation"] = df["Arm_Elevation"].astype(np.float64)
+            df["Arm_Above_90"] = np.where(df["Arm_Elevation"] >= 90, 1, 0)
+            # print(df)
+            # print(df.info())
+            # print(df.describe())
 
             df.to_csv(os.path.basename(f) + ".csv", index=False)
 

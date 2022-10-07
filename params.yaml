@@ -1,11 +1,12 @@
 profile:
-    dataset: digitalworker_reduced_classes
-        # dataset: test
+        #dataset: digitalworker_arm_angle_reduced_classes
+    # dataset: digitalworker_reduced_classes
+    dataset: test
 
 clean:
-    target: Class
-    classification: True
-    onehot_encode_target: True
+    target: Arm_Elevation
+    classification: False
+    onehot_encode_target: False
     combine_files: False
     percentage_zeros_threshold: 1.0
     correlation_metric: pearson
@@ -17,9 +18,9 @@ featurize:
         # - Trunk_AccX 
         # - Trunk_AccY 
         # - Trunk_AccZ 
-        # - Arm_AccX 
-        # - Arm_AccY 
-        # - Arm_AccZ 
+        - Arm_AccX 
+        - Arm_AccY 
+        - Arm_AccZ 
         # - Hip_AccX 
         # - Hip_AccY 
         # - Hip_AccZ 
@@ -155,6 +156,7 @@ featurize:
     # from them
     remove_features:
         - Timestamp
+        - Arm_Above_90
     target_min_correlation_threshold: 0.0
 
 split:
