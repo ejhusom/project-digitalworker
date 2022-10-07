@@ -169,7 +169,7 @@ scale:
     output:
 
 sequentialize:
-    window_size: 15
+    window_size: 5
     overlap: 0
     target_size: 1
     shuffle_samples: False

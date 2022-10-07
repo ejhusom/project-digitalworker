@@ -70,7 +70,7 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
             #df = dfs[-1]
             df = pd.read_csv(filepath)
             df["Class"] = df["Class"].astype(np.int64)
-            df["Arm_Elevation"] = df["Arm_Elevation"].astype(np.int64)
+            df["Arm_Elevation"] = df["Arm_Elevation"].astype(np.float64)
             dfs.append(df)
     else:
         # Remove features that should not be used with the current model.
@@ -120,10 +120,11 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
         combined_df.to_csv(DATA_CLEANED_PATH / (os.path.basename("data-cleaned.csv")))
     else:
         for filepath, df in zip(filepaths, dfs):
-            df.to_csv(
-                DATA_CLEANED_PATH
-                / (os.path.basename(filepath).replace(".", "-cleaned."))
-            )
+            if not df.empty:
+                df.to_csv(
+                    DATA_CLEANED_PATH
+                    / (os.path.basename(filepath).replace(".", "-cleaned."))
+                )
 
     pd.DataFrame(output_columns).to_csv(OUTPUT_FEATURES_PATH)
 
