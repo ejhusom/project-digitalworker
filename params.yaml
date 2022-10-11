@@ -19,8 +19,8 @@ featurize:
         # - Trunk_AccY 
         # - Trunk_AccZ 
         - Arm_AccX 
-        - Arm_AccY 
-        - Arm_AccZ 
+          # - Arm_AccY 
+          # - Arm_AccZ 
         # - Hip_AccX 
         # - Hip_AccY 
         # - Hip_AccZ 
