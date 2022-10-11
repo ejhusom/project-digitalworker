@@ -18,7 +18,7 @@ stages:
       size: 1903
     params:
       params.yaml:
-        profile.dataset: test
+        profile.dataset: digitalworker_arm_angle_reduced_classes
   clean:
     cmd: python3 src/clean.py assets/data/raw/
     deps:
