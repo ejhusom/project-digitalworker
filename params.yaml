@@ -16,9 +16,9 @@ clean:
 featurize:
     # If empty, all input variables are used
     variables_to_include:
-        # - Trunk_AccX 
-        # - Trunk_AccY 
-        # - Trunk_AccZ 
+        - Trunk_AccX 
+        - Trunk_AccY 
+        - Trunk_AccZ 
         - Arm_AccX 
         - Arm_AccY 
         - Arm_AccZ 
