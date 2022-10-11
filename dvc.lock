@@ -101,23 +101,20 @@ stages:
         - Thigh_AccX
         - Thigh_AccY
         - Thigh_AccZ
-        - Calf_AccX
-        - Calf_AccY
-        - Calf_AccZ
     outs:
     - path: assets/data/featurized
-      md5: 9f9dd2e6965415fb242ff87f29ee1315.dir
-      size: 214203040
+      md5: e580730256a4ce397ac1497d37e5b829.dir
+      size: 182073544
       nfiles: 50
     - path: assets/features/input_columns.csv
-      md5: 175ce9fdf3abbb49a8a5eb5f62592cc2
-      size: 152
+      md5: 02ab7eef3a420173dbd67fb0fe718527
+      size: 114
   split:
     cmd: python3 src/split.py assets/data/featurized/
     deps:
     - path: assets/data/featurized
-      md5: 9f9dd2e6965415fb242ff87f29ee1315.dir
-      size: 214203040
+      md5: e580730256a4ce397ac1497d37e5b829.dir
+      size: 182073544
       nfiles: 50
     - path: src/config.py
       md5: 7b988b2b39fb5979b5a7f703e708a435
@@ -132,15 +129,15 @@ stages:
         split.train_split: 0.5
     outs:
     - path: assets/data/split
-      md5: efb8354fae6660c76fe823346f90e223.dir
-      size: 214203040
+      md5: 4ec604b312f3b36457b2a14c0cc719d8.dir
+      size: 182073544
       nfiles: 50
   scale:
     cmd: python3 src/scale.py assets/data/split/
     deps:
     - path: assets/data/split
-      md5: efb8354fae6660c76fe823346f90e223.dir
-      size: 214203040
+      md5: 4ec604b312f3b36457b2a14c0cc719d8.dir
+      size: 182073544
       nfiles: 50
     - path: assets/features/output_columns.csv
       md5: b520619408d9f0152dc8db27de23005d
@@ -158,12 +155,12 @@ stages:
         scale.output:
     outs:
     - path: assets/data/scaled
-      md5: d59018577aacc49fde742018c6ef47ad.dir
-      size: 214221140
+      md5: 7c8e1b6a3325e03751ecc608163e5438.dir
+      size: 182091644
       nfiles: 50
     - path: assets/scalers/input_scaler.z
-      md5: c68aad302ed0ca45a278c21df58976c3
-      size: 887
+      md5: faf92c9ffb319f38343b8160dd886969
+      size: 762
     - path: assets/scalers/output_scaler.z
       md5: 30f8aad524f01b45b31c24e9de78ebf9
       size: 121
@@ -171,8 +168,8 @@ stages:
     cmd: python3 src/sequentialize.py assets/data/scaled/
     deps:
     - path: assets/data/scaled
-      md5: d59018577aacc49fde742018c6ef47ad.dir
-      size: 214221140
+      md5: 7c8e1b6a3325e03751ecc608163e5438.dir
+      size: 182091644
       nfiles: 50
     - path: assets/features/output_columns.csv
       md5: b520619408d9f0152dc8db27de23005d
@@ -197,15 +194,15 @@ stages:
         train.learning_method: cnn
     outs:
     - path: assets/data/sequentialized
-      md5: eaf0fdc4f9155cd14ae4967cf095478f.dir
-      size: 134250484
+      md5: 985eea2ad7b87d7d6fc0d2f7c9e19591.dir
+      size: 102121924
       nfiles: 50
   combine:
     cmd: python3 src/combine.py assets/data/sequentialized/
     deps:
     - path: assets/data/sequentialized
-      md5: eaf0fdc4f9155cd14ae4967cf095478f.dir
-      size: 134250484
+      md5: 985eea2ad7b87d7d6fc0d2f7c9e19591.dir
+      size: 102121924
       nfiles: 50
     - path: src/combine.py
       md5: d175bad0793f77c653fed58d9941c567
@@ -215,15 +212,15 @@ stages:
       size: 3667
     outs:
     - path: assets/data/combined
-      md5: 1bdc221237ac70b4db9e4f69607f8cfc.dir
-      size: 134226964
+      md5: 976909d7cfa377dacf8d600723e306ea.dir
+      size: 102098404
       nfiles: 2
   train:
     cmd: python3 src/train.py assets/data/combined/train.npz
     deps:
     - path: assets/data/combined
-      md5: 1bdc221237ac70b4db9e4f69607f8cfc.dir
-      size: 134226964
+      md5: 976909d7cfa377dacf8d600723e306ea.dir
+      size: 102098404
       nfiles: 2
     - path: assets/features/output_columns.csv
       md5: b520619408d9f0152dc8db27de23005d
@@ -263,22 +260,22 @@ stages:
         train.unit_type: LSTM
     outs:
     - path: assets/models
-      md5: ffc7cf628740a24a5ac56d05430dc456.dir
-      size: 929912
+      md5: 8f77340d8c15cd91988fd5eef471920d.dir
+      size: 923000
       nfiles: 1
   evaluate:
     cmd: python3 src/evaluate.py assets/models/model.h5 assets/data/combined/train.npz
       assets/data/combined/test.npz assets/data/combined/calibrate.npz
     deps:
     - path: assets/data/combined/test.npz
-      md5: 971895e0bd118809b63438f39a035359
-      size: 69115306
+      md5: 58be54f363904e1a82270b0fcf515766
+      size: 52571866
     - path: assets/features/output_columns.csv
       md5: b520619408d9f0152dc8db27de23005d
       size: 83
     - path: assets/models/model.h5
-      md5: bb7a131ec0f03c342a7b1d1f4f55a72e
-      size: 929912
+      md5: 5d59cc7fc451bab8fa2d867ff20810cb
+      size: 923000
     - path: src/config.py
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
@@ -291,7 +288,7 @@ stages:
         evaluate.show_inputs: true
     outs:
     - path: assets/predictions/predictions.csv
-      md5: e9195048deca0f2e28d1994ad5c7e694
+      md5: 52d7a4fc20f2e205663342f2ea3cb161
       size: 91910
     - path: assets/predictions/true_values.csv
       md5: 67b6f577dd5f0fd4c2cf17c90048b442
