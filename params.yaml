@@ -1,11 +1,11 @@
 profile:
-    dataset: digitalworker_arm_angle_reduced_classes
+        # dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    # dataset: test
+    dataset: test
 
 clean:
-    target: Arm_Elevation
-    classification: False
+    target: Arm_Above_90
+    classification: True
     onehot_encode_target: False
     combine_files: False
     percentage_zeros_threshold: 1.0
@@ -156,7 +156,7 @@ featurize:
     # from them
     remove_features:
         - Timestamp
-        - Arm_Above_90
+          #- Arm_Above_90
     target_min_correlation_threshold: 0.0
 
 split:
