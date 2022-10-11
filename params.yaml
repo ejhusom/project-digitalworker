@@ -1,10 +1,11 @@
 profile:
-    dataset: digitalworker_arm_angle_reduced_classes
+        # dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    # dataset: test
+    dataset: test
 
 clean:
-    target: Arm_Above_90
+        #target: Arm_Above_90
+    target: Class
     classification: True
     onehot_encode_target: False
     combine_files: False
@@ -19,8 +20,8 @@ featurize:
         # - Trunk_AccY 
         # - Trunk_AccZ 
         - Arm_AccX 
-          # - Arm_AccY 
-          # - Arm_AccZ 
+        - Arm_AccY 
+        - Arm_AccZ 
         # - Hip_AccX 
         # - Hip_AccY 
         # - Hip_AccZ 
@@ -156,7 +157,7 @@ featurize:
     # from them
     remove_features:
         - Timestamp
-          #- Arm_Above_90
+         #- Arm_Above_90
     target_min_correlation_threshold: 0.0
 
 split:
