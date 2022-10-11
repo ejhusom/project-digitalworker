@@ -1,7 +1,7 @@
 profile:
         # dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    dataset: test
+    dataset: test_new
 
 clean:
         #target: Arm_Above_90
