@@ -7,7 +7,7 @@ clean:
         #target: Arm_Above_90
     target: Class
     classification: True
-    onehot_encode_target: False
+    onehot_encode_target: True
     combine_files: False
     percentage_zeros_threshold: 1.0
     correlation_metric: pearson
@@ -157,7 +157,7 @@ featurize:
     # from them
     remove_features:
         - Timestamp
-         #- Arm_Above_90
+        #- Arm_Above_90
     target_min_correlation_threshold: 0.0
 
 split:
@@ -170,7 +170,7 @@ scale:
     output:
 
 sequentialize:
-    window_size: 1
+    window_size: 15
     overlap: 0
     target_size: 1
     shuffle_samples: False
@@ -178,7 +178,7 @@ sequentialize:
 
 train:
     seed: 2020
-    learning_method: xgboost
+    learning_method: cnn
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):

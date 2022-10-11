@@ -166,6 +166,6 @@ stages:
         params:
         - clean.classification
         - evaluate.show_inputs
-        metrics:
-        - assets/metrics/metrics.json
+          #metrics:
+                #- assets/metrics/metrics.json
 
