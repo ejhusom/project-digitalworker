@@ -94,22 +94,35 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
 
         if onehot_encode_target and len(np.unique(combined_df[target])) > 2:
             encoder = LabelBinarizer()
+            #unique_labels = [0, 1]
         else:
             if onehot_encode_target:
                 raise ValueError(
                     "Parameter 'onehot_encode_target' is set to True, but target is binary. Change parameter to False in order to use this pipeline."
                 )
             encoder = LabelEncoder()
+            #unique_labels = [0, 1, 2, 3, 4, 5, 6, 7]
 
         target_col = np.array(combined_df[target]).reshape(-1)
         encoder.fit(target_col)
-        # print(f"Classes: {encoder.classes_}")
-        # print(f"Encoded classes: {encoder.transform(encoder.classes_)}")
+        print(f"Classes: {encoder.classes_}")
+        print(f"Encoded classes: {encoder.transform(encoder.classes_)}")
 
         combined_df, output_columns = encode_target(encoder, combined_df, target)
 
+        dfs_to_delete = []
+
         for i in range(len(dfs)):
-            dfs[i], _ = encode_target(encoder, dfs[i], target)
+            try:
+                dfs[i], _ = encode_target(encoder, dfs[i], target)
+            except:
+                dfs_to_delete.append(i)
+
+        print(f"Number of empty dataframes/files: {len(dfs_to_delete)}")
+        print(f"Original of dataframes/files: {len(dfs)}")
+
+        for i in dfs_to_delete:
+            del dfs[i]
 
     else:
         output_columns = [target]
@@ -266,7 +279,6 @@ def parse_profile_warnings():
         removable_features.remove(target)
 
     return removable_features
-
 
 if __name__ == "__main__":
 

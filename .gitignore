@@ -3,6 +3,9 @@
 *.csv
 assets/data/raw
 !assets/data/raw/README.md
+!assets/predictions/
+!assets/predictions/predictions.csv
+!assets/predictions/true_values.csv
 
 # misc:
 .DS_Store
