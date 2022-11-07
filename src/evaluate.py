@@ -550,18 +550,87 @@ def plot_confusion(y_test, y_pred):
     n_output_cols = len(output_columns)
     indeces = np.arange(0, n_output_cols, 1)
 
-    confusion = confusion_matrix(y_test, y_pred, normalize="true")
-    # labels=indeces)
+    if len(indeces) == 8:
+        labels = [
+                "Lie",
+                "Kneel",
+                "Sit",
+                "Stand",
+                "Other",
+                "Walk",
+                "Run",
+                "Stairs"
+        ]
+    elif len(indeces) == 12:
+        labels = [
+                "Sensor Off",
+                "Lie",
+                "Kneel",
+                "Sit",
+                "Stand",
+                "Other",
+                "Run",
+                "Stairs",
+                "Cycle",
+                "Row",
+                "Walk Slow",
+                "Walk Fast"
+        ]
+    elif len(indeces) == 13:
+        labels = [
+                "Sensor Off",
+                "Lie",
+                "Kneel",
+                "Sit",
+                "Stand",
+                "Other",
+                "Walk",
+                "Run",
+                "Stairs",
+                "Cycle",
+                "Row",
+                "Walk Slow",
+                "Walk Fast"
+        ]
+    else:
+        labels = indeces
 
-    print(confusion)
+    confusion = confusion_matrix(y_test, y_pred, normalize="true")
+
+    # print(confusion)
 
     df_confusion = pd.DataFrame(confusion)
 
     df_confusion.index.name = "True"
     df_confusion.columns.name = "Pred"
     plt.figure(figsize=(10, 7))
-    sn.heatmap(df_confusion, cmap="Blues", annot=True, annot_kws={"size": 16})
+    # sn.heatmap(df_confusion, cmap="Blues", annot=True, annot_kws={"size": 16})
+    sn.heatmap(
+            df_confusion, 
+            cmap="Blues", 
+            annot=True, 
+            annot_kws={"size": 16},
+            xticklabels=labels,
+            yticklabels=labels,
+    )
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
+
+if __name__ == '__main__': 
+
+    y_pred_file = sys.argv[1]
+    y_test_file = sys.argv[2]
+
+    # Read predictions
+    y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
+    # print(y_pred)
+
+    # Read true values
+    y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
+    # Convert from one-hot encoding back to classes
+    y_test = np.argmax(y_test, axis=-1)
+    # print(y_test)
+
+    plot_confusion_for_paper(y_test, y_pred)
 
 
 def save_predictions(df_predictions):
