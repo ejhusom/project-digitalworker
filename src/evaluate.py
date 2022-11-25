@@ -41,6 +41,8 @@ from sklearn.metrics import (
 )
 from sklearn.neighbors import KNeighborsRegressor
 from tensorflow.keras import metrics, models
+from scipy.sparse import coo_matrix
+from sklearn.utils.multiclass import unique_labels
 
 import neural_networks as nn
 
@@ -126,6 +128,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
     test = np.load(test_filepath)
     X_test = test["X"]
     y_test = test["y"]
+    y_pred_std = None
 
     if show_inputs:
         inputs = X_test
@@ -333,7 +336,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
         plot_prediction(y_test, y_pred, info="Accuracy: {})".format(accuracy))
 
-        plot_confusion(y_test, y_pred)
+        plot_confusion(y_test, y_pred, y_pred_std)
 
         with open(METRICS_FILE_PATH, "w") as f:
             json.dump(dict(accuracy=accuracy), f)
@@ -534,25 +537,61 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
 
     confusion = confusion_matrix(y_test, y_pred, normalize="true")
 
-    # print(confusion)
-
-    df_confusion = pd.DataFrame(confusion)
+    df_confusion = pd.DataFrame(confusion).round(2)
 
     df_confusion.index.name = "True"
     df_confusion.columns.name = "Pred"
     plt.figure(figsize=(10, 7))
-    # sn.heatmap(df_confusion, cmap="Blues", annot=True, annot_kws={"size": 16})
     sn.heatmap(
             df_confusion, 
             cmap="Blues", 
             annot=True, 
-            annot_kws={"size": 16},
+            annot_kws={"size": 14},
             xticklabels=labels,
             yticklabels=labels,
     )
+    plt.tight_layout()
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
 
-    # if y_pred_std is not None:
+    if y_pred_std is not None:
+        int_labels = unique_labels(y_test, y_pred)
+        n_labels = int_labels.size
+
+        cm = coo_matrix(
+                (y_pred_std, (y_test, y_pred)),
+                shape=(n_labels, n_labels)
+        )
+
+        combined_arr = np.stack((y_test, y_pred), axis=1)
+
+        unique_predictions, counts = np.unique(combined_arr, axis=0, return_counts=True)
+        u_true = unique_predictions[:,0]
+        u_pred = unique_predictions[:,1]
+
+        cm_count = coo_matrix(
+                (counts, (u_true, u_pred)),
+                shape=(n_labels, n_labels)
+        )
+
+        cm = cm / cm_count
+        
+        cm = pd.DataFrame(cm)
+
+        df_confusion.index.name = "True"
+        df_confusion.columns.name = "Pred"
+        plt.figure(figsize=(10, 7))
+        sn.heatmap(
+                cm, 
+                cmap="Reds", 
+                annot=df_confusion, 
+                # annot=True,
+                annot_kws={"size": 14},
+                xticklabels=labels,
+                yticklabels=labels,
+        )
+        plt.tight_layout()
+        plt.savefig(PLOTS_PATH / "probablistic_confusion_matrix.png")
+        # plt.show()
 
 
 def save_predictions(df_predictions):

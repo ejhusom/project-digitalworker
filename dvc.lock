@@ -274,8 +274,8 @@ stages:
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
     - path: src/evaluate.py
-      md5: 7d080508124ed14d57fc530905a80a2b
-      size: 26399
+      md5: f74e941ca3e791f9043108368ea2cd65
+      size: 27582
     params:
       params.yaml:
         clean.classification: true
