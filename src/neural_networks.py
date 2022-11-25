@@ -106,7 +106,6 @@ def cnn(
     n_dense_layers=1,
     n_nodes=16,
     dropout=0.0,
-    training=False,
     seed=2020,
 ):
     """Define a CNN model architecture using Keras.
@@ -136,9 +135,6 @@ def cnn(
         maxpooling_size (int): Size of maxpooling.
         dropout (float or list of float): Dropout, either the same for all
             layers, or a list specifying dropout for each layer.
-        training (bool): Use training mode during inference. Will affect layers
-            that behave differentely during inference by default (for example
-            Dropout).
         seed (int): Seed for random initialization of weights.
 
     Returns:
