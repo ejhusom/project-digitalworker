@@ -70,7 +70,10 @@ def clean(dir_path=DATA_PATH_RAW, inference_df=None):
             #df = dfs[-1]
             df = pd.read_csv(filepath)
             df["Class"] = df["Class"].astype(np.int64)
-            df["Arm_Elevation"] = df["Arm_Elevation"].astype(np.float64)
+            try:
+                df["Arm_Elevation"] = df["Arm_Elevation"].astype(np.float64)
+            except:
+                pass
             dfs.append(df)
     else:
         # Remove features that should not be used with the current model.

@@ -118,6 +118,8 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
     onehot_encode_target = yaml.safe_load(open("params.yaml"))["clean"][
         "onehot_encode_target"
     ]
+    dropout_uncertainty_estimation = params["dropout_uncertainty_estimation"]
+    uncertainty_estimation_sampling_size = params["uncertainty_estimation_sampling_size"]
     show_inputs = params["show_inputs"]
     learning_method = params_train["learning_method"]
 
@@ -299,7 +301,22 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
             # Fit the normalizer.
         else:
             model = models.load_model(model_filepath)
-            y_pred = model.predict(X_test)
+            if dropout_uncertainty_estimation:
+                predictions = []
+
+                for i in range(uncertainty_estimation_sampling_size):
+                    predictions.append(model(X_test, training=True))
+
+                predictions = np.stack(predictions, -1)
+                mean = np.mean(predictions, axis=-1)
+                std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+
+                y_pred = mean
+                y_pred_std = std
+                print(y_pred.shape)
+                print(y_pred_std.shape)
+            else:
+                y_pred = model.predict(X_test)
 
         if onehot_encode_target:
             y_pred = np.argmax(y_pred, axis=-1)
@@ -379,86 +396,6 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
         pass
 
     save_predictions(pd.DataFrame(y_pred))
-
-    # if learning_method.lower() == "explainableboosting":
-    #     explain_glassbox(model)
-    # else:
-    #     explain_blackbox(model, X_test, X_test[:10], y_test[:10])
-
-
-    # ==========================================
-    # TODO: Fix SHAP code
-    # explainer = shap.TreeExplainer(model, X_test[:10])
-    # shap_values = explainer.shap_values(X_test[:10])
-    # plt.figure()
-    # shap.summary_plot(shap_values[0][:,0,:], X_test[:10][:,0,:])
-    # shap.image_plot([shap_values[i][0] for i in range(len(shap_values))], X_test[:10])
-    # shap.force_plot(explainer.expected_value[0], shap_values[0][0])
-
-    # plt.savefig("test.png")
-
-    # feature_importances = model.feature_importances_
-    # imp = list()
-    # for i, f in enumerate(feature_importances):
-    #     imp.append((f,i))
-
-    # sorted_feature_importances = sorted(imp)
-
-    # print("Feature importances")
-    # print(sorted_feature_importances)
-    # ==========================================
-    # shap.initjs()
-    # """
-
-
-    """
-    input_columns = pd.read_csv(INPUT_FEATURES_PATH, header=None)
-    input_columns = input_columns.iloc[1:,1].to_list()
-
-    train = np.load(train_filepath)
-    X_train = train["X"]
-    X_summary = shap.kmeans(X_train, 20)
-    ex = shap.KernelExplainer(model.predict, X_summary)
-    # ex = shap.KernelExplainer(model.predict, shap.sample(X_train, 100))
-    # ex = shap.TreeExplainer(model)
-    # shap_values = ex.shap_values(shap.sample(X_test, 10))
-    shap_values = ex.shap_values(X_test[0])
-
-    # Single prediction
-    shap.force_plot(ex.expected_value, shap_values, np.around(X_test[0], decimals=2), show=True,
-            matplotlib=True, feature_names=input_columns)
-
-            # feature_names=input_columns)
-
-    plt.savefig(PLOTS_PATH / "shap_force_plot_single.png")
-
-    # plt.figure()
-    # shap.force_plot(ex.expected_value, shap_values[0], shap.sample(X_test, 10), show=False,
-            # matplotlib=True, feature_names=input_columns)
-    # plt.savefig(PLOTS_PATH / "shap_force_plot_single.png")
-
-    X_values = X_test
-    shap_values = ex.shap_values(X_test)
-    shap.summary_plot(shap_values, X_values,
-            feature_names=input_columns, plot_size=(8,5), show=False)
-    plt.savefig(PLOTS_PATH / "shap_summary_plot.png", bbox_inches='tight', dpi=300)
-    """
-
-def explain_blackbox(model, X, X_sample, y_sample):
-
-    lime = LimeTabular(predict_fn=model.predict, data=X)
-    lime_local = lime.explain_local(X_sample, y_sample)
-    interpret.show(lime_local)
-
-def explain_glassbox(model):
-
-    # set_visualize_provider(InlineProvider())
-
-    model_global = model.explain_global()
-    # with open("htmltest.html", "w") as f:
-    #     f.write(interpret.show(model_global))
-    interpret.show(model_global)
-
 
 def compute_uncertainty(model, test_data, iterations=100):
     """A function to compute aleatoric and epistemic uncertainty of a probabilistic Gaussain model
@@ -540,7 +477,7 @@ def coverage_probability2(samples, y_true, alpha=0.05):
     return 100 * np.mean(within_confidence_interval)
 
 
-def plot_confusion(y_test, y_pred):
+def plot_confusion(y_test, y_pred, y_pred_std=None):
     """Plotting confusion matrix of a classification model."""
 
     output_columns = np.array(pd.read_csv(OUTPUT_FEATURES_PATH, index_col=0)).reshape(
@@ -615,22 +552,7 @@ def plot_confusion(y_test, y_pred):
     )
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
 
-if __name__ == '__main__': 
-
-    y_pred_file = sys.argv[1]
-    y_test_file = sys.argv[2]
-
-    # Read predictions
-    y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
-    # print(y_pred)
-
-    # Read true values
-    y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
-    # Convert from one-hot encoding back to classes
-    y_test = np.argmax(y_test, axis=-1)
-    # print(y_test)
-
-    plot_confusion_for_paper(y_test, y_pred)
+    # if y_pred_std is not None:
 
 
 def save_predictions(df_predictions):
