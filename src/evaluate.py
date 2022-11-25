@@ -41,6 +41,8 @@ from sklearn.metrics import (
 )
 from sklearn.neighbors import KNeighborsRegressor
 from tensorflow.keras import metrics, models
+from scipy.sparse import coo_matrix
+from sklearn.utils.multiclass import unique_labels
 
 import neural_networks as nn
 
@@ -118,12 +120,15 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
     onehot_encode_target = yaml.safe_load(open("params.yaml"))["clean"][
         "onehot_encode_target"
     ]
+    dropout_uncertainty_estimation = params["dropout_uncertainty_estimation"]
+    uncertainty_estimation_sampling_size = params["uncertainty_estimation_sampling_size"]
     show_inputs = params["show_inputs"]
     learning_method = params_train["learning_method"]
 
     test = np.load(test_filepath)
     X_test = test["X"]
     y_test = test["y"]
+    y_pred_std = None
 
     if show_inputs:
         inputs = X_test
@@ -300,7 +305,22 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
             # Fit the normalizer.
         else:
             model = models.load_model(model_filepath)
-            y_pred = model.predict(X_test)
+            if dropout_uncertainty_estimation:
+                predictions = []
+
+                for i in range(uncertainty_estimation_sampling_size):
+                    predictions.append(model(X_test, training=True))
+
+                predictions = np.stack(predictions, -1)
+                mean = np.mean(predictions, axis=-1)
+                std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+
+                y_pred = mean
+                y_pred_std = std
+                print(y_pred.shape)
+                print(y_pred_std.shape)
+            else:
+                y_pred = model.predict(X_test)
 
         if onehot_encode_target:
             y_pred = np.argmax(y_pred, axis=-1)
@@ -317,7 +337,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
         plot_prediction(y_test, y_pred, info="Accuracy: {})".format(accuracy))
 
-        plot_confusion(y_test, y_pred)
+        plot_confusion(y_test, y_pred, y_pred_std)
 
         with open(METRICS_FILE_PATH, "w") as f:
             json.dump(dict(accuracy=accuracy), f)
@@ -380,86 +400,6 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
         pass
 
     save_predictions(pd.DataFrame(y_pred))
-
-    # if learning_method.lower() == "explainableboosting":
-    #     explain_glassbox(model)
-    # else:
-    #     explain_blackbox(model, X_test, X_test[:10], y_test[:10])
-
-
-    # ==========================================
-    # TODO: Fix SHAP code
-    # explainer = shap.TreeExplainer(model, X_test[:10])
-    # shap_values = explainer.shap_values(X_test[:10])
-    # plt.figure()
-    # shap.summary_plot(shap_values[0][:,0,:], X_test[:10][:,0,:])
-    # shap.image_plot([shap_values[i][0] for i in range(len(shap_values))], X_test[:10])
-    # shap.force_plot(explainer.expected_value[0], shap_values[0][0])
-
-    # plt.savefig("test.png")
-
-    # feature_importances = model.feature_importances_
-    # imp = list()
-    # for i, f in enumerate(feature_importances):
-    #     imp.append((f,i))
-
-    # sorted_feature_importances = sorted(imp)
-
-    # print("Feature importances")
-    # print(sorted_feature_importances)
-    # ==========================================
-    # shap.initjs()
-    # """
-
-
-    """
-    input_columns = pd.read_csv(INPUT_FEATURES_PATH, header=None)
-    input_columns = input_columns.iloc[1:,1].to_list()
-
-    train = np.load(train_filepath)
-    X_train = train["X"]
-    X_summary = shap.kmeans(X_train, 20)
-    ex = shap.KernelExplainer(model.predict, X_summary)
-    # ex = shap.KernelExplainer(model.predict, shap.sample(X_train, 100))
-    # ex = shap.TreeExplainer(model)
-    # shap_values = ex.shap_values(shap.sample(X_test, 10))
-    shap_values = ex.shap_values(X_test[0])
-
-    # Single prediction
-    shap.force_plot(ex.expected_value, shap_values, np.around(X_test[0], decimals=2), show=True,
-            matplotlib=True, feature_names=input_columns)
-
-            # feature_names=input_columns)
-
-    plt.savefig(PLOTS_PATH / "shap_force_plot_single.png")
-
-    # plt.figure()
-    # shap.force_plot(ex.expected_value, shap_values[0], shap.sample(X_test, 10), show=False,
-            # matplotlib=True, feature_names=input_columns)
-    # plt.savefig(PLOTS_PATH / "shap_force_plot_single.png")
-
-    X_values = X_test
-    shap_values = ex.shap_values(X_test)
-    shap.summary_plot(shap_values, X_values,
-            feature_names=input_columns, plot_size=(8,5), show=False)
-    plt.savefig(PLOTS_PATH / "shap_summary_plot.png", bbox_inches='tight', dpi=300)
-    """
-
-def explain_blackbox(model, X, X_sample, y_sample):
-
-    lime = LimeTabular(predict_fn=model.predict, data=X)
-    lime_local = lime.explain_local(X_sample, y_sample)
-    interpret.show(lime_local)
-
-def explain_glassbox(model):
-
-    # set_visualize_provider(InlineProvider())
-
-    model_global = model.explain_global()
-    # with open("htmltest.html", "w") as f:
-    #     f.write(interpret.show(model_global))
-    interpret.show(model_global)
-
 
 def compute_uncertainty(model, test_data, iterations=100):
     """A function to compute aleatoric and epistemic uncertainty of a probabilistic Gaussain model
@@ -541,7 +481,7 @@ def coverage_probability2(samples, y_true, alpha=0.05):
     return 100 * np.mean(within_confidence_interval)
 
 
-def plot_confusion(y_test, y_pred):
+def plot_confusion(y_test, y_pred, y_pred_std=None):
     """Plotting confusion matrix of a classification model."""
 
     output_columns = np.array(pd.read_csv(OUTPUT_FEATURES_PATH, index_col=0)).reshape(
@@ -598,24 +538,61 @@ def plot_confusion(y_test, y_pred):
 
     confusion = confusion_matrix(y_test, y_pred, normalize="true")
 
-    # print(confusion)
-
-    df_confusion = pd.DataFrame(confusion)
+    df_confusion = pd.DataFrame(confusion).round(2)
 
     df_confusion.index.name = "True"
     df_confusion.columns.name = "Pred"
     plt.figure(figsize=(10, 7))
-    # sn.heatmap(df_confusion, cmap="Blues", annot=True, annot_kws={"size": 16})
     sn.heatmap(
             df_confusion, 
             cmap="Blues", 
             annot=True, 
-            annot_kws={"size": 16},
+            annot_kws={"size": 14},
             xticklabels=labels,
             yticklabels=labels,
     )
+    plt.tight_layout()
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
 
+    if y_pred_std is not None:
+        int_labels = unique_labels(y_test, y_pred)
+        n_labels = int_labels.size
+
+        cm = coo_matrix(
+                (y_pred_std, (y_test, y_pred)),
+                shape=(n_labels, n_labels)
+        )
+
+        combined_arr = np.stack((y_test, y_pred), axis=1)
+
+        unique_predictions, counts = np.unique(combined_arr, axis=0, return_counts=True)
+        u_true = unique_predictions[:,0]
+        u_pred = unique_predictions[:,1]
+
+        cm_count = coo_matrix(
+                (counts, (u_true, u_pred)),
+                shape=(n_labels, n_labels)
+        )
+
+        cm = cm / cm_count
+        
+        cm = pd.DataFrame(cm)
+
+        df_confusion.index.name = "True"
+        df_confusion.columns.name = "Pred"
+        plt.figure(figsize=(10, 7))
+        sn.heatmap(
+                cm, 
+                cmap="Reds", 
+                annot=df_confusion, 
+                # annot=True,
+                annot_kws={"size": 14},
+                xticklabels=labels,
+                yticklabels=labels,
+        )
+        plt.tight_layout()
+        plt.savefig(PLOTS_PATH / "probablistic_confusion_matrix.png")
+        # plt.show()
 
 def save_predictions(df_predictions):
     """Save the predictions along with the ground truth as a csv file.

@@ -1,5 +1,7 @@
 profile:
         # dataset: digitalworker_arm_angle_reduced_classes
+    # dataset: digitalworker
+    # dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
     dataset: test_new
 
@@ -178,7 +180,7 @@ sequentialize:
 
 train:
     seed: 2020
-    learning_method: brnn
+    learning_method: cnn
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
@@ -190,7 +192,7 @@ train:
     n_layers: 4
     n_neurons: [64,64,64,64]
     # n_neurons: [16,16,16,8]
-    dropout: 0.1
+    dropout: 0.5
 
     # Parameters for cnn and rnn
     n_flattened_layers: 2
@@ -205,4 +207,6 @@ train:
     unit_type: LSTM
 
 evaluate:
+    dropout_uncertainty_estimation: True
+    uncertainty_estimation_sampling_size: 4
     show_inputs: True
