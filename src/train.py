@@ -374,13 +374,15 @@ def train(filepath):
             output_activation=output_activation,
             classification=classification,
         )
-        # model = nn.bcnn_edward(data_size=X_train.shape[0],
-        #                 window_size=X_train.shape[1],
-        #                 feature_size=X_train.shape[2],
-        #                 kernel_size=params["kernel_size"],
-        #                 n_steps_out=output_length,
-        #                 output_activation=output_activation,
-        #                 classification=classification)
+        model.build(input_shape=[None,X_train.shape[1],X_train.shape[2]])
+    elif learning_method == "bcnn_edward":
+        model = nn.bcnn_edward(data_size=X_train.shape[0],
+                        window_size=X_train.shape[1],
+                        feature_size=X_train.shape[2],
+                        kernel_size=params["kernel_size"],
+                        n_steps_out=output_length,
+                        output_activation=output_activation,
+                        classification=classification)
     else:
         raise NotImplementedError(f"Learning method {learning_method} not implemented.")
 

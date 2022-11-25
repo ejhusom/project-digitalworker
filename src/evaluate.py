@@ -224,7 +224,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
                 data_size=X_test.shape[0],
                 window_size=X_test.shape[1],
                 feature_size=X_test.shape[2],
-                # hidden_size=params_train["hidden_size"],
+                hidden_size=10,#params_train["hidden_size"],
                 batch_size=params_train["batch_size"],
             )
             model.load_weights(model_filepath)
@@ -270,6 +270,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
                 batch_size=params_train["batch_size"],
                 kernel_size=params_train["kernel_size"],
             )
+            model.build(input_shape=[None,X_test.shape[1],X_test.shape[2]])
             model.load_weights(model_filepath)
 
             input_columns = pd.read_csv(INPUT_FEATURES_PATH, index_col=0)
@@ -277,7 +278,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
             X_test[300:305, :, :] = 3
             y_pred = model(X_test)
 
-            assert isinstance(y_pred, tfd.Distribution)
+            #assert isinstance(y_pred, tfd.Distribution)
             mean = y_pred.mean().numpy()
 
             aleatoric, epistemic = compute_uncertainty(
@@ -614,23 +615,6 @@ def plot_confusion(y_test, y_pred):
             yticklabels=labels,
     )
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
-
-if __name__ == '__main__': 
-
-    y_pred_file = sys.argv[1]
-    y_test_file = sys.argv[2]
-
-    # Read predictions
-    y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
-    # print(y_pred)
-
-    # Read true values
-    y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
-    # Convert from one-hot encoding back to classes
-    y_test = np.argmax(y_test, axis=-1)
-    # print(y_test)
-
-    plot_confusion_for_paper(y_test, y_pred)
 
 
 def save_predictions(df_predictions):

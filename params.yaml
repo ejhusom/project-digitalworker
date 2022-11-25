@@ -1,7 +1,7 @@
 profile:
-    dataset: digitalworker_arm_angle_reduced_classes
+        # dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    # dataset: test_new
+    dataset: test_new
 
 clean:
         #target: Arm_Above_90
@@ -178,12 +178,12 @@ sequentialize:
 
 train:
     seed: 2020
-    learning_method: cnn
+    learning_method: brnn
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 200
-    early_stopping: True
+    n_epochs: 1
+    early_stopping: False
     patience: 20
     activation_function: relu
     batch_size: 256

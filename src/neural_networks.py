@@ -366,8 +366,100 @@ def cnndnn(input_x, input_y, n_forecast_hours, n_steps_out=1):
 
     return model
 
-
 def bcnn(
+    data_size,
+    window_size,
+    feature_size,
+    batch_size,
+    kernel_size=5,
+    n_steps_out=2,
+    classification=False,
+    output_activation="linear",
+):
+    """Creates a Keras model using the temporal bayesian cnn architecture.
+    We use the Flipout Monte Carlo estimator for the convolution and fully-connected layers:
+    This enables lower variance stochastic gradients than naive reparameterization
+
+     Args:
+         data_size: (int )Number of training examples
+         window_size: (int ) Number of historical sequence used as an input
+         feature_size: (int) Number of features(sensors) used as an input
+         batch_size: (int) Size of single batch used as an input
+         '
+         kernel_size: (int,default : 5) Size of kernel in CNN
+
+         n_steps_out: (int,default : 2)  Number of output classes for classification.
+         classification: (boolean, default: False). True if the model is used for classification tasts
+         output_activation: (str or tf.nn.activation, default "linear")
+
+     Returns: (model) Compiled Keras model.
+
+    """
+
+    # KL divergence weighted by the number of training samples, using
+    # lambda function to pass as input to the kernel_divergence_fn on
+    # flipout layers.
+    kl_divergence_function = lambda q, p, _: tfd.kl_divergence(q, p) / tf.cast(
+        data_size, dtype=tf.float32
+    )
+
+
+    model = tf.keras.models.Sequential([
+        tfp.layers.Convolution1DFlipout(
+            64,
+            kernel_size=kernel_size,
+            padding="SAME",
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.relu,
+            name="cnn1"),
+        tfp.layers.Convolution1DFlipout(
+            64,
+            kernel_size=kernel_size,
+            padding="SAME",
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.relu,
+            name="cnn2"),
+        tfp.layers.Convolution1DFlipout(
+            64,
+            kernel_size=kernel_size,
+            padding="SAME",
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.relu,
+            name="cnn3"),
+        tfp.layers.Convolution1DFlipout(
+            64,
+            kernel_size=kernel_size,
+            padding="SAME",
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.relu,
+            name="cnn4"),
+        tf.keras.layers.Flatten(),
+        tfp.layers.DenseFlipout(
+            32,
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.relu),
+        tfp.layers.DenseFlipout(
+            8,
+            kernel_divergence_fn=kl_divergence_function,
+            activation=tf.nn.softmax),
+        # tfp.distributions.Categorical(
+        #     logits=None,
+        #     #logits=layer_4_outputs,
+        #     #probs=None,
+        #     dtype=tf.int32,
+        #     validate_args=False,
+        #     allow_nan_stats=True,
+        #     name="Categorical",)
+        ])
+
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+    model.compile(optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
+
+    return model
+
+def bcnn_old(
     data_size,
     window_size,
     feature_size,
@@ -434,48 +526,35 @@ def bcnn(
         32, kernel_divergence_fn=kl_divergence_function, name="dense1"
     )(flatten_layer_outputs)
 
-    if classification:
-        layer_4_outputs = tfp.layers.DenseFlipout(
-            n_steps_out,
-            kernel_divergence_fn=kl_divergence_function,
-            name="dense2",
-            activation=output_activation,
-        )(layer_3_outputs)
-        outputs = tfp.distributions.Categorical(
-            logits=layer_4_outputs,
-            probs=None,
-            dtype=tf.int32,
-            validate_args=False,
-            allow_nan_stats=True,
-            name="Categorical",
-        )
-    else:
-        layer_4_outputs = tfp.layers.DenseFlipout(
-            2,
-            kernel_divergence_fn=kl_divergence_function,
-            name="dense2",
-            activation=output_activation,
-        )(layer_3_outputs)
-        loc = layer_4_outputs[..., :1]
-        c = np.log(np.expm1(1.0))
-        scale_diag = 1e-5 + tf.nn.softplus(
-            c + layer_4_outputs[..., 1:]
-        )  ##tf.nn.softplus(outputs[..., 1:]) + 1e-5
-        outputs = tf.keras.layers.Concatenate(name="concatenate")([loc, scale_diag])
-        outputs = tfp.layers.DistributionLambda(
-            lambda t: tfd.Independent(
-                tfd.Normal(loc=t[..., :1], scale=t[..., 1:]),
-                reinterpreted_batch_ndims=1,
-            ),
-            name="lambda_normal_dist_layer",
-        )(outputs)
+    layer_4_outputs = tfp.layers.DenseFlipout(
+        n_steps_out,
+        kernel_divergence_fn=kl_divergence_function,
+        name="dense2",
+        activation=output_activation,
+    )(layer_3_outputs)
+
+    outputs = tfp.distributions.Categorical(
+        logits=layer_4_outputs,
+        probs=None,
+        dtype=tf.int32,
+        validate_args=False,
+        allow_nan_stats=True,
+        name="Categorical",
+    )
+    # outputs = tfp.layers.OneHotCategorical(
+    #     event_size,
+    #     convert_to_tensor_fn=tfp.distributions.Distribution.sample,
+    #     sample_dtype=tf.int32,
+    #     validate_args=False,
+    #     allow_nan_stats=True
+    # )
+
+
     model = models.Model(inputs=inputs, outputs=outputs, name="bvae")
-    if classification:
-        neg_log_likelihood = lambda x, rv_x: -tf.reduce_mean(
-            input_tensor=rv_x.log_prob(x)
-        )
-    else:
-        neg_log_likelihood = lambda x, rv_x: -rv_x.log_prob(x)
+
+    neg_log_likelihood = lambda x, rv_x: -tf.reduce_mean(
+        input_tensor=rv_x.log_prob(x)
+    )
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
 
