@@ -1,9 +1,8 @@
 profile:
-        # dataset: digitalworker_arm_angle_reduced_classes
-    # dataset: digitalworker
-    # dataset: digitalworker_arm_angle_reduced_classes
+    dataset: digitalworker_arm_angle_reduced_classes
     # dataset: digitalworker_reduced_classes
-    dataset: test_new
+    # dataset: digitalworker
+    # dataset: test_new
 
 clean:
         #target: Arm_Above_90
@@ -21,9 +20,9 @@ featurize:
             # - Trunk_AccX 
             # - Trunk_AccY 
           # - Trunk_AccZ 
-        - Arm_AccX 
-        - Arm_AccY 
-        - Arm_AccZ 
+          # - Arm_AccX 
+        # - Arm_AccY 
+        # - Arm_AccZ 
         # - Hip_AccX 
         # - Hip_AccY 
         # - Hip_AccZ 
@@ -163,7 +162,7 @@ featurize:
     target_min_correlation_threshold: 0.0
 
 split:
-    train_split: 0.5
+    train_split: 0.7
     shuffle_files: False
     calibrate_split: 0.0
 
@@ -184,7 +183,7 @@ train:
     hyperparameter_tuning: False
 
     # Parameters for deep learning (dnn, cnn, lstm etc):
-    n_epochs: 1
+    n_epochs: 200
     early_stopping: False
     patience: 20
     activation_function: relu
