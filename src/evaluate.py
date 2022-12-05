@@ -317,8 +317,8 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
                 y_pred = mean
                 y_pred_std = std
-                print(y_pred.shape)
-                print(y_pred_std.shape)
+                pd.DataFrame(y_pred_std).to_csv(PREDICTIONS_PATH /
+                        "predictions_uncertainty.csv")
             else:
                 y_pred = model.predict(X_test)
 
@@ -538,7 +538,7 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
 
     confusion = confusion_matrix(y_test, y_pred, normalize="true")
 
-    df_confusion = pd.DataFrame(confusion).round(2)
+    df_confusion = pd.DataFrame(confusion).round(3)
 
     df_confusion.index.name = "True"
     df_confusion.columns.name = "Pred"
@@ -547,7 +547,7 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
             df_confusion, 
             cmap="Blues", 
             annot=True, 
-            annot_kws={"size": 14},
+            annot_kws={"size": 10},
             xticklabels=labels,
             yticklabels=labels,
     )
