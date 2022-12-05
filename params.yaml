@@ -191,7 +191,7 @@ train:
     n_layers: 4
     n_neurons: [64,64,64,64]
     # n_neurons: [16,16,16,8]
-    dropout: 0.5
+    dropout: 0.3
 
     # Parameters for cnn and rnn
     n_flattened_layers: 2

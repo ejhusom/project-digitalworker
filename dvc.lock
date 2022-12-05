@@ -230,7 +230,7 @@ stages:
         clean.classification: true
         train.activation_function: relu
         train.batch_size: 256
-        train.dropout: 0.5
+        train.dropout: 0.3
         train.early_stopping: false
         train.hyperparameter_tuning: false
         train.kernel_size: 3
@@ -251,7 +251,7 @@ stages:
         train.unit_type: LSTM
     outs:
     - path: assets/models
-      md5: 3ead31ee3c0b7e92d4b1f360bba474b1.dir
+      md5: d3b523aca63e824a490611bbf422c4d7.dir
       size: 941432
       nfiles: 1
   evaluate:
@@ -265,7 +265,7 @@ stages:
       md5: b520619408d9f0152dc8db27de23005d
       size: 83
     - path: assets/models/model.h5
-      md5: e5fa352d0f7c34ef9afd109b16fb32a2
+      md5: bda3de7c05ff6c8d161b4743423a37a0
       size: 941432
     - path: src/config.py
       md5: 7b988b2b39fb5979b5a7f703e708a435
