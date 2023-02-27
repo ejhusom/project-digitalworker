@@ -313,7 +313,8 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
                 predictions = np.stack(predictions, -1)
                 mean = np.mean(predictions, axis=-1)
-                std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+                #std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+                std = - np.sum(predictions * np.log(predictions + 1e-15), axis=-1)
 
                 y_pred = mean
                 y_pred_std = std

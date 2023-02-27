@@ -9,6 +9,11 @@ Created:
     2021
 
 """
+import pandas as pd
+import numpy as np
+from tensorflow.keras import metrics, models
+import yaml
+
 from config import (
     DATA_PATH,
     INPUT_FEATURES_PATH,
@@ -35,7 +40,7 @@ uncertainty_estimation_sampling_size = params["uncertainty_estimation_sampling_s
 show_inputs = params["show_inputs"]
 learning_method = params_train["learning_method"]
 
-test = np.load("assets/combined/test.npz")
+test = np.load("assets/data/combined/test.npz")
 X_test = test["X"]
 y_test = test["y"]
 y_pred_std = None
@@ -49,13 +54,24 @@ for i in range(uncertainty_estimation_sampling_size):
 
 predictions = np.stack(predictions, -1)
 mean = np.mean(predictions, axis=-1)
-std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+
+#std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
+std2 = - np.sum(predictions * np.log(predictions + 1e-15), axis=-1)
+
+#print("============")
+#print(std)
+#print(std.shape)
+#print(std.max())
+print("============")
+print(std2)
+print(std2.shape)
+print(std2.max())
+print("============")
 
 y_pred = mean
 y_pred_std = std
-pd.DataFrame(y_pred_std).to_csv(PREDICTIONS_PATH /
-        "predictions_uncertainty.csv")
+#pd.DataFrame(y_pred_std).to_csv(PREDICTIONS_PATH /
+#        "predictions_uncertainty.csv")
 
 y_pred = np.argmax(y_pred, axis=-1)
-
 
