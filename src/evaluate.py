@@ -313,8 +313,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
                 predictions = np.stack(predictions, -1)
                 mean = np.mean(predictions, axis=-1)
-                #std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
-                std = - np.sum(predictions * np.log(predictions + 1e-15), axis=-1)
+                std = - 1.0 * np.sum(mean * np.log(mean + 1e-15), axis=-1)
 
                 y_pred = mean
                 y_pred_std = std
@@ -491,6 +490,7 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
 
     n_output_cols = len(output_columns)
     indeces = np.arange(0, n_output_cols, 1)
+    n_labels = len(indeces)
 
     if len(indeces) == 8:
         labels = [
@@ -556,9 +556,6 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
     plt.savefig(PLOTS_PATH / "confusion_matrix.png")
 
     if y_pred_std is not None:
-        int_labels = unique_labels(y_test, y_pred)
-        n_labels = int_labels.size
-
         cm = coo_matrix(
                 (y_pred_std, (y_test, y_pred)),
                 shape=(n_labels, n_labels)
@@ -581,6 +578,7 @@ def plot_confusion(y_test, y_pred, y_pred_std=None):
 
         df_confusion.index.name = "True"
         df_confusion.columns.name = "Pred"
+
         plt.figure(figsize=(10, 7))
         sn.heatmap(
                 cm, 
