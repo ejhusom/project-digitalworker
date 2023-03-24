@@ -286,11 +286,11 @@ stages:
       md5: 7b988b2b39fb5979b5a7f703e708a435
       size: 3667
     - path: src/evaluate.py
-      md5: a80756fb279a588a7ca2e575b94ab1e5
-      size: 27708
+      md5: ff96e52d6b3aadac61aae9de2fa8f508
+      size: 27650
     params:
       params.yaml:
         clean.classification: true
         evaluate.dropout_uncertainty_estimation: true
         evaluate.show_inputs: true
-        evaluate.uncertainty_estimation_sampling_size: 4
+        evaluate.uncertainty_estimation_sampling_size: 100

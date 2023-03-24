@@ -207,5 +207,5 @@ train:
 
 evaluate:
     dropout_uncertainty_estimation: True
-    uncertainty_estimation_sampling_size: 4
+    uncertainty_estimation_sampling_size: 100
     show_inputs: True
