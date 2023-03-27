@@ -229,7 +229,9 @@ if __name__ == '__main__':
     # print(y_test)
 
     # Read uncertainty
-    y_pred_std = pd.read_csv(y_pred_std_file, index_col=0).to_numpy().flatten()
+    # y_pred_std = pd.read_csv(y_pred_std_file, index_col=0).to_numpy().flatten()
+    y_pred_std = pd.read_csv(y_pred_std_file, index_col=0).to_numpy()
+    y_pred_std = np.mean(y_pred_std, axis=1)
 
     # plot_confusion_for_paper(y_test, y_pred)
     calculate_metrics(y_test, y_pred, y_pred_std)
