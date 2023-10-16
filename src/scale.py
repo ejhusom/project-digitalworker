@@ -30,8 +30,10 @@ from config import (
     SCALER_PATH,
 )
 from preprocess_utils import find_files
+from codecarbon import track_emissions
 
 
+@track_emissions(project_name="scale")
 def scale(dir_path):
     """Scale training and test data.
 

@@ -19,6 +19,7 @@ from pandas.api.types import is_numeric_dtype
 from scipy.signal import find_peaks
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
+from codecarbon import track_emissions
 
 from config import (
     DATA_FEATURIZED_PATH,
@@ -30,6 +31,7 @@ from config import (
 from preprocess_utils import find_files, move_column
 
 
+@track_emissions(project_name="featurize")
 def featurize(dir_path="", inference=False, inference_df=None):
     """Clean up inputs and add features to data set.
 

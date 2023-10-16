@@ -43,6 +43,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from tensorflow.keras import metrics, models
 from scipy.sparse import coo_matrix
 from sklearn.utils.multiclass import unique_labels
+from codecarbon import track_emissions
 
 import neural_networks as nn
 
@@ -99,6 +100,7 @@ class ConformalPredictionModel(RegressorAdapter):
         return predictions
 
 
+@track_emissions(project_name="evaluate")
 def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
     """Evaluate model to estimate power.
 

@@ -54,6 +54,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.utils import plot_model
 # from tensorflow.keras.wrappers.scikit_learn import KerasRegressor, KerasClassifier
 # import tensorflow.keras.wrappers.scikit_learn as tf_sklearn
+from codecarbon import track_emissions
 
 import neural_networks as nn
 from config import (
@@ -68,6 +69,7 @@ from config import (
 )
 
 
+@track_emissions(project_name="train")
 def train(filepath):
     """Train model to estimate power.
 
