@@ -7,6 +7,7 @@ assets/data/raw
 !assets/predictions/predictions.csv
 !assets/predictions/predictions_uncertainty.csv
 !assets/predictions/true_values.csv
+!emissions*
 
 # misc:
 .DS_Store
