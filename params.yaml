@@ -23,15 +23,15 @@ featurize:
         - Arm_AccX 
         - Arm_AccY 
         - Arm_AccZ 
-        - Hip_AccX 
-        - Hip_AccY 
-        - Hip_AccZ 
-        - Thigh_AccX 
-        - Thigh_AccY 
-        - Thigh_AccZ 
-        - Calf_AccX 
-        - Calf_AccY 
-        - Calf_AccZ
+          #- Hip_AccX 
+          #- Hip_AccY 
+          #- Hip_AccZ 
+         #- Thigh_AccX 
+         #- Thigh_AccY 
+         #- Thigh_AccZ 
+          #- Calf_AccX 
+          #- Calf_AccY 
+          #- Calf_AccZ
 
     # By setting this to True, the add_-options below are overrided.
     use_all_engineered_features_on_all_variables: False
