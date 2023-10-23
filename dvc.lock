@@ -204,8 +204,8 @@ stages:
       md5: 317b4d9674ca46acc17a1e8da4fa604e
       size: 3918
     - path: src/profiling.py
-      md5: be89ec773042d8b5e133104462585172
-      size: 1984
+      md5: 7ea3e7f24eb3dcde9a477f51b5d2cf08
+      size: 1985
     params:
       params.yaml:
         profile.dataset: digitalworker_arm_angle_reduced_classes

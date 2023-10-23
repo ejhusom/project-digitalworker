@@ -67,10 +67,10 @@ def profiling(dir_path):
 
     # Save report to files.
     profile.to_file(PROFILE_PATH / "profile.html")
-    profile.to_file(PROFILE_PATH / "profile.json")
+    #profile.to_file(PROFILE_PATH / "profile.json")
 
 
 if __name__ == "__main__":
 
-    # profiling(sys.argv[1])
-    print("Profiling ignored")
+    profiling(sys.argv[1])
+    # print("Profiling ignored")
