@@ -340,7 +340,7 @@ def evaluate(model_filepath, train_filepath, test_filepath, calibrate_filepath):
 
         plot_prediction(y_test, y_pred, info="Accuracy: {})".format(accuracy))
 
-        plot_confusion(y_test, y_pred, y_pred_std)
+        # plot_confusion(y_test, y_pred, y_pred_std)
 
         with open(METRICS_FILE_PATH, "w") as f:
             json.dump(dict(accuracy=accuracy), f)
