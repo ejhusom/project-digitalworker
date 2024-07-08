@@ -19,7 +19,7 @@ import plotly
 import plotly.graph_objects as go
 import seaborn as sn
 import tensorflow as tf
-import tensorflow_probability as tfp
+# import tensorflow_probability as tfp
 import yaml
 import interpret
 from interpret import set_visualize_provider
@@ -49,8 +49,8 @@ import neural_networks as nn
 
 tfk = tf.keras
 tfkl = tf.keras.layers
-tfpl = tfp.layers
-tfd = tfp.distributions
+# tfpl = tfp.layers
+# tfd = tfp.distributions
 
 import neural_networks as nn
 from config import (
