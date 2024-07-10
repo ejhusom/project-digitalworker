@@ -16,7 +16,23 @@ import numpy as np
 import pandas as pd
 import seaborn as sn
 
-from sklearn.metrics import confusion_matrix
+import os
+
+
+from scipy.sparse import coo_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+    explained_variance_score,
+    mean_absolute_percentage_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+)
+from sklearn.utils.multiclass import unique_labels
 
 from config import OUTPUT_FEATURES_PATH, PLOTS_PATH
 
@@ -89,7 +105,7 @@ def accuracy_across_classes():
     df = df.iloc[::-1]
 
     # Plotting the data
-    df.plot(kind="bar", figsize=(8, 6), colormap='viridis')
+    df.plot(kind="bar", figsize=(8, 4), colormap='viridis')
     # plt.title("Accuracy of Different Classes Across Sensor Configurations")
     plt.xlabel("Feature set")
     plt.ylabel("Accuracy")
@@ -124,7 +140,7 @@ def uncertainty():
     df = df.iloc[::-1]
 
     # Plot
-    fig, ax1 = plt.subplots(figsize=(7, 6))
+    fig, ax1 = plt.subplots(figsize=(7, 5))
 
     # Bar plot for accuracy
     bars = ax1.bar(df['Set'], df['Accuracy'], color='skyblue', label='Accuracy')
@@ -151,22 +167,195 @@ def uncertainty():
     plt.savefig(PLOTS_PATH / "uncertainty.pdf")
     plt.show()
 
+def generate_uncertainty_plots(y_true, y_predicted, y_predicted_std):
+    class_names = [
+            "Lie",
+            "Kneel",
+            "Sit",
+            "Stand",
+            "Other",
+            "Walk",
+            "Run",
+            "Stairs"
+    ]
+    # Create a DataFrame for easier manipulation and plotting
+    data = {
+        'True': [class_names[i] for i in y_true],
+        'Predicted': [class_names[i] for i in y_predicted],
+        'Uncertainty': y_predicted_std,
+        'Correct': y_true == y_predicted
+    }
+
+    df = pd.DataFrame(data)
+
+    # Plot 1: Uncertainty Distribution Plot
+    plt.figure(figsize=(12, 6))
+    sn.boxplot(x='True', y='Uncertainty', data=df)
+    plt.title('Uncertainty Distribution for Each Class')
+    plt.xlabel('Class')
+    plt.ylabel('Uncertainty')
+    plt.xticks(rotation=45)
+    plt.show()
+
+    # Plot 2: Uncertainty vs. Accuracy Scatter Plot
+    plt.figure(figsize=(12, 6))
+    sn.scatterplot(x='True', y='Uncertainty', hue='Correct', data=df, palette={True: 'green', False: 'red'})
+    plt.title('Uncertainty vs. Accuracy')
+    plt.xlabel('Class')
+    plt.ylabel('Uncertainty')
+    plt.legend(title='Correct Prediction')
+    plt.xticks(rotation=45)
+    plt.show()
+
+    # Plot 3: Uncertainty Heatmap
+    uncertainty_mean = df.groupby('True')['Uncertainty'].mean().reset_index()
+    uncertainty_mean = uncertainty_mean.set_index('True').T  # Transpose for heatmap
+    
+    plt.figure(figsize=(10, 6))
+    sn.heatmap(uncertainty_mean, annot=True, cmap='viridis', cbar_kws={'label': 'Uncertainty'})
+    plt.title('Average Uncertainty for Each Class')
+    plt.xlabel('Class')
+    plt.ylabel('Average Uncertainty')
+    plt.xticks(rotation=45)
+    plt.show()
+
+
+def uncertainty_detailed():
+    y_test_file = "assets/predictions/true_values.csv"
+    y_pred_file = "assets/predictions/predictions.csv"
+    y_pred_std_file = "assets/predictions/predictions_uncertainty.csv"
+
+    # Read true values
+    y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
+    # Convert from one-hot encoding back to classes
+    y_test = np.argmax(y_test, axis=-1)
+
+    # Read predictions
+    y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
+    # print(y_pred)
+
+    # Read uncertainty
+    y_pred_std = pd.read_csv(y_pred_std_file, index_col=0).to_numpy()
+    y_pred_std = np.mean(y_pred_std, axis=1)
+
+    confusion = confusion_matrix(
+            y_test, 
+            y_pred, 
+            normalize="true",
+    )
+
+    accuracies = confusion.diagonal().round(2).tolist()
+
+    print("Accuracies:")
+    print(" & ".join(map(str, accuracies)))
+
+    int_labels = unique_labels(y_test, y_pred)
+    n_labels = int_labels.size
+    print(n_labels)
+    print(y_test.shape)
+    print(y_pred.shape)
+    print(y_pred_std.shape)
+
+    generate_uncertainty_plots(y_test, y_pred, y_pred_std)
+
+
+def uncertainty_final():
+
+    # Define the directories and file names
+    directories = ['arm', 'arm_trunk', 'arm_trunk_thigh', 'arm_trunk_thigh_calf', 'arm_trunk_thigh_calf_hip']
+    feature_sets = ['Arm', 'Arm, trunk', 'Arm, trunk, thigh', 'Arm, trunk, thigh, calf', 'Arm, trunk, thigh, calf, hip']
+
+    for i in range(len(directories)):
+        directories[i] = "assets/results/" + directories[i]
+
+    # Mapping posture integers to class names
+    class_names = ['Lie', 'Kneel', 'Sit', 'Stand', 'Other', 'Walk', 'Run', 'Stairs']
+
+    # Initialize a list to collect all data
+    all_data = []
+
+    # Read data from each directory
+    for feature_set, directory in zip(feature_sets, directories):
+        y_test_file = os.path.join(directory, 'true_values.csv')
+        y_pred_file = os.path.join(directory, 'predictions.csv')
+        y_pred_std_file = os.path.join(directory, 'predictions_uncertainty.csv')
+
+        # Read true values
+        y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
+        true_values = np.argmax(y_test, axis=-1)
+
+        # Read predictions
+        y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
+
+        # Read uncertainty
+        y_pred_std = pd.read_csv(y_pred_std_file, index_col=0).to_numpy()
+        y_pred_std = np.mean(y_pred_std, axis=1)
+
+        # Create a DataFrame for easier manipulation and plotting
+        data = {
+            'FeatureSet': feature_set,
+            'True': [class_names[i] for i in true_values],
+            'Predicted': [class_names[i] for i in y_pred],
+            'Uncertainty': y_pred_std,
+            'Correct': true_values == y_pred
+        }
+        df = pd.DataFrame(data)
+        all_data.append(df)
+
+    # Concatenate all data into a single DataFrame
+    df_all = pd.concat(all_data)
+
+    # Ensure the 'True' column is treated as categorical with the correct order
+    df_all['True'] = pd.Categorical(df_all['True'], categories=class_names, ordered=True)
+
+    # Group and calculate mean uncertainty
+    grouped = df_all.groupby(['FeatureSet', 'True', 'Correct'])['Uncertainty'].mean().reset_index()
+
+    # Pivot the data for better plotting
+    pivot_correct = grouped[grouped['Correct'] == True].pivot(index='True', columns='FeatureSet', values='Uncertainty')
+    pivot_incorrect = grouped[grouped['Correct'] == False].pivot(index='True', columns='FeatureSet', values='Uncertainty')
+
+    # Plot the results
+    fig, axes = plt.subplots(1, 2, figsize=(8.5, 4.5))#, sharey=True)
+
+    sn.heatmap(pivot_correct, annot=True, cmap='Reds', ax=axes[0], cbar_kws={'label': 'Uncertainty'})
+    axes[0].set_title('Average Uncertainty for Correct Predictions')
+    axes[0].set_xlabel('Feature Set')
+    axes[0].set_ylabel('Class')
+    axes[0].set_xticklabels(axes[0].get_xticklabels(), rotation=45, ha='right')
+    # axes[0].set_yticklabels(axes[0].get_yticklabels(), rotation=45, va='top')
+    axes[0].set_yticklabels(axes[0].get_yticklabels(), rotation=0)
+
+    sn.heatmap(pivot_incorrect, annot=True, cmap='Reds', ax=axes[1], cbar_kws={'label': 'Uncertainty'})
+    axes[1].set_title('Average Uncertainty for Misclassifications')
+    axes[1].set_xlabel('Feature Set')
+    axes[1].set_ylabel('Class')
+    axes[1].set_xticklabels(axes[1].get_xticklabels(), rotation=45, ha='right')
+    # axes[1].set_yticklabels(axes[1].get_yticklabels(), rotation=45, va='top')
+    axes[1].set_yticklabels(axes[1].get_yticklabels(), rotation=0)
+
+    plt.tight_layout()
+    plt.savefig(PLOTS_PATH / "uncertainty_heatmap_all_results.pdf")
+    # plt.show()
+
+    # Pivot the data for better printing
+    pivot_correct = grouped[grouped['Correct'] == True].pivot(index='True', columns='FeatureSet', values='Uncertainty')
+    pivot_incorrect = grouped[grouped['Correct'] == False].pivot(index='True', columns='FeatureSet', values='Uncertainty')
+
+    # Print the results as tables
+    print("Average Uncertainty for Correct Predictions")
+    print(pivot_correct)
+
+    print("\nAverage Uncertainty for Misclassifications")
+    print(pivot_incorrect)
+
 
 if __name__ == '__main__': 
-
-#     y_pred_file = sys.argv[1]
-#     y_test_file = sys.argv[2]
-
-#     # Read predictions
-#     y_pred = pd.read_csv(y_pred_file).to_numpy().flatten()
-
-#     # Read true values
-#     y_test = pd.read_csv(y_test_file, index_col=0).to_numpy()
-#     # Convert from one-hot encoding back to classes
-#     y_test = np.argmax(y_test, axis=-1)
-
-#     plot_confusion(y_test, y_pred)
-
-    # accuracy_across_classes()
-    uncertainty()
+    # Testing functions:
+    # uncertainty_detailed()
     # plot_results_2()
+
+    # Final functions:
+    # accuracy_across_classes()
+    # uncertainty()
+    uncertainty_final()
